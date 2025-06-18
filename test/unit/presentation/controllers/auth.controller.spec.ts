@@ -6,11 +6,13 @@ import { ValidateTokenUseCase } from '../../../../src/application/use-cases/vali
 import { LoginDto } from '../../../../src/presentation/dtos/login.dto';
 import { ValidateTokenDto } from '../../../../src/presentation/dtos/validate-token.dto';
 import { UnauthorizedException as DomainUnauthorizedException } from '../../../../src/domain/exceptions/unauthorized.exception';
+import { TelemetryService } from '../../../../src/telemetry/telemetry.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
   let loginUseCase: LoginUseCase;
   let validateTokenUseCase: ValidateTokenUseCase;
+  let telemetryService: TelemetryService;
 
   const mockLoginUseCase = {
     execute: jest.fn(),
@@ -19,6 +21,10 @@ describe('AuthController', () => {
   const mockValidateTokenUseCase = {
     execute: jest.fn(),
   };
+
+  const mockTelemetryService = {
+    logError: jest.fn(),
+  } as unknown as TelemetryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,12 +38,17 @@ describe('AuthController', () => {
           provide: ValidateTokenUseCase,
           useValue: mockValidateTokenUseCase,
         },
+        {
+          provide: TelemetryService,
+          useValue: mockTelemetryService,
+        },
       ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
     loginUseCase = module.get<LoginUseCase>(LoginUseCase);
     validateTokenUseCase = module.get<ValidateTokenUseCase>(ValidateTokenUseCase);
+    telemetryService = module.get<TelemetryService>(TelemetryService);
   });
 
   afterEach(() => {
@@ -53,7 +64,7 @@ describe('AuthController', () => {
       // Arrange
       const loginDto: LoginDto = {
         email: 'user@example.com',
-        senha: 'password123',
+        password: 'password123',
       };
       const expectedResult = { token: 'test-token' };
       mockLoginUseCase.execute.mockResolvedValue(expectedResult);
@@ -65,7 +76,7 @@ describe('AuthController', () => {
       expect(result).toEqual({ token: 'test-token' });
       expect(loginUseCase.execute).toHaveBeenCalledWith({
         email: loginDto.email,
-        password: loginDto.senha,
+        password: loginDto.password,
       });
     });
 
@@ -73,7 +84,7 @@ describe('AuthController', () => {
       // Arrange
       const loginDto: LoginDto = {
         email: 'user@example.com',
-        senha: 'wrong-password',
+        password: 'wrong-password',
       };
       mockLoginUseCase.execute.mockRejectedValue(
         new DomainUnauthorizedException('Invalid credentials')
@@ -83,7 +94,7 @@ describe('AuthController', () => {
       await expect(controller.login(loginDto)).rejects.toThrow(UnauthorizedException);
       expect(loginUseCase.execute).toHaveBeenCalledWith({
         email: loginDto.email,
-        password: loginDto.senha,
+        password: loginDto.password,
       });
     });
   });

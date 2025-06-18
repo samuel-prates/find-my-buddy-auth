@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Node.js
+node_modules
+npm-debug.log
+
+# Build files
+dist
+
+# Docker
+docker
+Dockerfile
+.dockerignore
+
+# Tests
+test
+coverage
+.nyc_output
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

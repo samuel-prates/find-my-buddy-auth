@@ -2,11 +2,13 @@ import { LoginUseCase } from '../../../../src/application/use-cases/login.use-ca
 import { UserRepository } from '../../../../src/domain/ports/user-repository.interface';
 import { TokenService } from '../../../../src/domain/ports/token-service.interface';
 import { UnauthorizedException } from '../../../../src/domain/exceptions/unauthorized.exception';
+import { TelemetryService } from '../../../../src/telemetry/telemetry.service';
 
 describe('LoginUseCase', () => {
   let useCase: LoginUseCase;
   let userRepository: UserRepository;
   let tokenService: TokenService;
+  let telemetryService: TelemetryService;
 
   beforeEach(() => {
     // Create mock implementations
@@ -21,8 +23,12 @@ describe('LoginUseCase', () => {
       validateToken: jest.fn(),
     };
 
+    telemetryService = {
+      logError: jest.fn(),
+    } as unknown as TelemetryService;
+
     // Create the use case with mocked dependencies
-    useCase = new LoginUseCase(userRepository, tokenService);
+    useCase = new LoginUseCase(userRepository, tokenService, telemetryService);
   });
 
   afterEach(() => {

@@ -98,6 +98,63 @@ chmod +x test-auth.sh
 ./test-auth.sh
 ```
 
+## Docker
+
+Este projeto inclui configuração Docker para facilitar o desenvolvimento e implantação.
+
+### Usando o Makefile
+
+Um Makefile foi criado para simplificar as operações com Docker. Você pode usar os seguintes comandos:
+
+```bash
+# Mostrar todos os comandos disponíveis
+make help
+
+# Iniciar todos os containers em modo detached
+make up
+
+# Parar e remover containers e redes
+make down
+
+# Reiniciar todos os containers
+make restart
+
+# Ver logs de todos os containers
+make logs
+
+# Ver logs apenas da API
+make logs-api
+
+# Ver logs apenas do banco de dados
+make logs-db
+
+# Listar containers em execução
+make ps
+
+# Reconstruir todos os containers
+make build
+
+# Remover containers, redes, imagens e volumes
+make clean
+
+# Remover todos os recursos Docker não utilizados (system-wide)
+make prune
+```
+
+### Usando Docker Compose Diretamente
+
+Alternativamente, você pode usar o Docker Compose diretamente:
+
+```bash
+# Iniciar os serviços
+docker-compose -f docker/docker-compose.yml up -d
+
+# Parar os serviços
+docker-compose -f docker/docker-compose.yml down
+```
+
+Para mais informações sobre a configuração Docker, consulte o arquivo [README.md](docker/README.md) na pasta docker.
+
 ## Estrutura do Projeto
 
 - `src/auth/dto/`: DTOs para requests/responses
@@ -110,16 +167,38 @@ chmod +x test-auth.sh
 
 ## Alterações Recentes
 
+- Adicionado script para criar um usuário administrador padrão
 - Corrigido um problema de tipagem no método `validateToken` do serviço de autenticação
 - Centralizado a definição da chave secreta JWT em um único arquivo de constantes
 - Adicionado um script de teste para verificar todos os endpoints de autenticação
 
-## Usuário de Teste
+## Usuários do Sistema
+
+### Usuário de Teste
 
 Para fins de demonstração, o sistema inclui um usuário de teste:
 
 - Email: user@example.com
 - Senha: password123
+
+### Usuário Administrador
+
+O sistema também inclui um usuário administrador padrão que pode ser criado usando o script de seed:
+
+- Email: admin@example.com
+- Senha: x3_Cr2qJ;@]PBQ}T
+
+Para criar o usuário administrador, execute um dos seguintes comandos:
+
+```bash
+# Usando npm
+npm run seed:admin
+
+# Usando o Makefile
+make seed-admin
+```
+
+Nota: O banco de dados deve estar em execução para que o script de seed funcione corretamente. Se você estiver usando Docker, certifique-se de que os containers estão em execução com `make up` antes de executar o script de seed.
 
 ## Deployment
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ValidateTokenUseCase } from '../../../../src/application/use-cases/validate-token.use-case';
 import { TokenService, TokenValidationResult } from '../../../../src/domain/ports/token-service.interface';
+import { TelemetryService } from '../../../../src/telemetry/telemetry.service';
 
 // Define string token for dependency injection
 const TOKEN_SERVICE = 'TOKEN_SERVICE';
@@ -8,11 +9,16 @@ const TOKEN_SERVICE = 'TOKEN_SERVICE';
 describe('ValidateTokenUseCase', () => {
   let useCase: ValidateTokenUseCase;
   let tokenService: jest.Mocked<TokenService>;
+  let telemetryService: TelemetryService;
 
   const mockTokenService = {
     generateToken: jest.fn(),
     validateToken: jest.fn(),
   };
+
+  const mockTelemetryService = {
+    logError: jest.fn(),
+  } as unknown as TelemetryService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,8 +28,12 @@ describe('ValidateTokenUseCase', () => {
           useValue: mockTokenService,
         },
         {
+          provide: TelemetryService,
+          useValue: mockTelemetryService,
+        },
+        {
           provide: ValidateTokenUseCase,
-          useFactory: () => new ValidateTokenUseCase(mockTokenService),
+          useFactory: () => new ValidateTokenUseCase(mockTokenService, mockTelemetryService),
         },
       ],
     }).compile();

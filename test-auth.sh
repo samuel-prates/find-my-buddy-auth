@@ -1,4 +1,4 @@
-#!/bin/bash
+--+#!/bin/bash
 
 # Test the login endpoint
 echo "Testing login endpoint..."
